@@ -58,11 +58,11 @@ def main():
     # Output
     print(f"Temperature in {city_name} is {temp_celsius:.2f}°C / {temp_fahrenheit:.2f}°F / {temp_kelvin:.2f}°K")
     print("")
-    print(f"Despite a temperature of {temp_celsius:.2f}°C, the temperature feels like {feels_like_celsius:.2f}°C / {feels_like_fahrenheit}°F / {feels_like_kelvin}°K.")
+    print(f"Despite a temperature of {temp_celsius:.2f}°C, the temperature feels like {feels_like_celsius:.2f}°C / {feels_like_fahrenheit:.2f}°F / {feels_like_kelvin}°K.")
     print("")
     print(f"The humidity is {humidity}%.")
     print("")
-    print(f"The wind speed is {wind_speed:.2f}m/s.")
+    print(f"The wind speed is {wind_speed:.2f} m/s.")
     print("")
     print(f"The general weather has: {description}.")
 
