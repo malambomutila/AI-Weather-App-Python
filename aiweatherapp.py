@@ -6,6 +6,11 @@ import sys
 import requests
 import json
 import datetime as dt
+import ttkbootstrap
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk
+
 
 '''
 -- API Key Grammar --
@@ -111,3 +116,89 @@ def temp_converter(temp_kelvin):
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+# --------------------------------------------------------------------------------------- #
+# GUI Draft 
+# ---------------------------------------------------------------------------------------- #
+
+# # Function to get weather info from API
+# def get_weather(city_name):
+#     API_Key = "fjdabfajdbajdbjd"
+#     url = f"hdshdhsvdh{city_name}bdhfbhdbfhd{API_Key}"
+#     response = requests.get(url)
+
+#     if res.status_code == 404:
+#         messagebox.showerror("Error", "City not found.")
+#         return None
+    
+#     # Parse the response JSON
+#     weather = response.json()
+#     icon_id = weather['weather'][0]['icon']
+#     temp_celsius = weather['main']['temp'] - 273.15
+#     description = weather['weather'][0]['description']
+#     city_name = weather['name']
+#     country = weather['sys']['country']
+
+#     # Icon Url and weather info
+#     icon_url = f"http://openweathermap.org/img/wn/{icon_id}@2x.png"
+#     return (icon_url, temp_celsius, description, city_name, country)
+
+#     # If the city is found, unpack the weather information, icon_url, temp, descr...
+#     location_label.configure(text=f"{city_name}, {country}")
+
+#     # Get the weather icon image from the URL and update the icon label
+#     Image = Image.open(requests.get(icon_url, stream=True).raw)
+#     icon = ImageTk.PhotoImage(Image)
+#     icon_label.configure(image=icon)
+#     icon_label.image = icon
+
+#     # Update the temperature and decription labels
+#     temp_celsius_label.configure(text=f"Temperature: {temp_celsius:.2f}oC")
+#     description_label.configure(text=f"Description: {description:.2f}")
+
+# # Function to search weather for a city
+# def search():
+#     city = city_name_entry.get()
+#     result = get_weather(city)
+#     if result in None:
+#         return
+
+# # Frontend
+# # Set window
+# root = ttkbootstrap.Window(themename="morph")
+# # App Title on title bar
+# root.title("Weather App")
+# # Window size
+# root.geometry("400x400")
+
+
+# # Entry widget to enter the city name
+# city_name_entry = ttkbootstrap.Entry(root, font="Helvetica, 18")
+# city_name_entry.pack(pady=10)
+
+# # Button widget to search for the weather information
+# search_button = ttkbootstrap.Button(root, text="Search", command=search, bootstyle="warning")
+# search_button.pack(pady=10)
+
+# # Label widget to show the city/country name
+# location_label = tk.Label(root, font="Helvetica, 25")
+# location_label.pack(pady=20)
+
+# # Label widget to show the weather icon
+# icon_label = tk.Label(root)
+# icon_label.pack()
+
+# # Label widget to show the temperature
+# temp_celsius_label = tk.Label(root, font="Helvetica, 20")
+# temp_celsius_label.pack()
+
+# # Label widget to show the description
+# description_label = tk.Label(root, font="Helvetica, 20")
+# description_label.pack()
+
+
+# root.mainloop()
