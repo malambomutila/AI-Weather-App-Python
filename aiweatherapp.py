@@ -37,9 +37,9 @@ The API should be the only text in the text file.
 '''
 
 # Collect the city name from the user and read API key from text file.
-def main():
+def main(event=None):
     try:
-        city_name = city_name_entry.get()
+        city_name = city_name_entry.get().strip().title()
     except (KeyboardInterrupt, EOFError):
         sys.exit(1)
     
@@ -63,7 +63,7 @@ def main():
     # Collect icon using icon_id
     icon = get_icon(icon_id)
 
-    # ----- Output // Label Configuration ----------------------------------------
+    # ----- Output // Frontend Label Configuration -------------------------------
     
     # Location: City, Country short code
     location_label.configure(text=f"{city_name}, {country}")
@@ -73,10 +73,10 @@ def main():
     icon_label.image = icon
 
     # Temperature
-    temp_label.configure(text=f"Temperature in {city_name}, {country} is {temp_celsius:.2f}°C / {temp_fahrenheit:.2f}°F / {temp_kelvin:.2f}°K")
+    temp_label.configure(text=f"Temperature in {city_name}, {country} is {temp_celsius:.2f}°C ({temp_fahrenheit:.2f}°F / {temp_kelvin:.2f}°K).")
 
     # Feels Like
-    feels_like_temp_label.configure(text=f"Despite a temperature of {temp_celsius:.2f}°C, the temperature feels like {feels_like_celsius:.2f}°C / {feels_like_fahrenheit:.2f}°F / {feels_like_kelvin}°K.")
+    feels_like_temp_label.configure(text=f"But it feels like {feels_like_celsius:.2f}°C ({feels_like_fahrenheit:.2f}°F / {feels_like_kelvin}°K).")
 
     # Humidity
     humidity_label.configure(text=f"The humidity is {humidity}%.")
@@ -143,46 +143,47 @@ def get_icon(icon_id):
 # Set window
 root = ttkbootstrap.Window(themename="morph")
 # App Title on title bar
-root.title("Weather App")
-# Window size
-root.geometry("400x400")
+root.title("Weather App - Malambo Mutila 2024")
+# Window size (width (horiz) x height (vert))
+root.geometry("600x550")
 
 
 # Entry widget to enter the city name
-city_name_entry = ttkbootstrap.Entry(root, font="Inter, 18")
-city_name_entry.pack(pady=10)
+city_name_entry = ttkbootstrap.Entry(root, width=40, font=("Inter Light", 12))
+city_name_entry.pack(pady=(64,24))
+city_name_entry.bind("<Return>", main) # Respond to "enter"/"return"
 
 # Button widget to search for the weather information
 search_button = ttkbootstrap.Button(root, text="Search", command=main, bootstyle="warning")
-search_button.pack(pady=10)
+search_button.pack()
 
 # Label widget to show the city/country name
-location_label = tk.Label(root, font="Inter, 25")
-location_label.pack(pady=20)
+location_label = tk.Label(root, font=("Inter Light", 12))
+location_label.pack(pady=(48,8))
 
 # Label widget to show the weather icon
 icon_label = tk.Label(root)
 icon_label.pack()
 
 # Label widget to show the temperature
-temp_label = tk.Label(root, font="Inter, 20")
-temp_label.pack()
+temp_label = tk.Label(root, font=("Inter Light", 12))
+temp_label.pack(pady=8)
 
 # Label widget to show what temperature feels like
-feels_like_temp_label = tk.Label(root, font="Inter, 20")
+feels_like_temp_label = tk.Label(root, font=("Inter Light", 12))
 feels_like_temp_label.pack()
 
 # Label widget to show the humidity
-humidity_label = tk.Label(root, font="Inter, 20")
-humidity_label.pack()
+humidity_label = tk.Label(root, font=("Inter Light", 12))
+humidity_label.pack(pady=8)
 
 # Label widget to show the wind speed
-wind_speed_label = tk.Label(root, font="Inter, 20")
+wind_speed_label = tk.Label(root, font=("Inter Light", 12))
 wind_speed_label.pack()
 
 # Label widget to show the description
-description_label = tk.Label(root, font="Inter, 20")
-description_label.pack()
+description_label = tk.Label(root, font=("Inter Light", 12))
+description_label.pack(pady=(8,0))
 
 
 root.mainloop()
