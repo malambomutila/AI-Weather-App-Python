@@ -39,7 +39,7 @@ The API should be the only text in the text file.
 # Collect the city name from the user and read API key from text file.
 def main():
     try:
-        city_name = input("Enter City: ").strip().title()
+        city_name = city_name_entry.get()
     except (KeyboardInterrupt, EOFError):
         sys.exit(1)
     
@@ -54,22 +54,38 @@ def main():
     response = get_response(api_url)
     
     # Query the response for weather data
-    temp_kelvin, feels_like_kelvin, humidity, wind_speed, description =  query_response(response)
+    temp_kelvin, feels_like_kelvin, humidity, wind_speed, description, country, icon_id =  query_response(response)
 
     # Convert Temperature from Kelvin to Celsius and Fahrenheit
     temp_celsius, temp_fahrenheit = temp_converter(temp_kelvin)
     feels_like_celsius, feels_like_fahrenheit = temp_converter(feels_like_kelvin)
 
-    # Output
-    print(f"Temperature in {city_name} is {temp_celsius:.2f}°C / {temp_fahrenheit:.2f}°F / {temp_kelvin:.2f}°K")
-    print("")
-    print(f"Despite a temperature of {temp_celsius:.2f}°C, the temperature feels like {feels_like_celsius:.2f}°C / {feels_like_fahrenheit:.2f}°F / {feels_like_kelvin}°K.")
-    print("")
-    print(f"The humidity is {humidity}%.")
-    print("")
-    print(f"The wind speed is {wind_speed:.2f} m/s.")
-    print("")
-    print(f"The general weather has: {description}.")
+    # Collect icon using icon_id
+    icon = get_icon(icon_id)
+
+    # ----- Output // Label Configuration ----------------------------------------
+    
+    # Location: City, Country short code
+    location_label.configure(text=f"{city_name}, {country}")
+
+    # Icon
+    icon_label.configure(image=icon)
+    icon_label.image = icon
+
+    # Temperature
+    temp_label.configure(text=f"Temperature in {city_name}, {country} is {temp_celsius:.2f}°C / {temp_fahrenheit:.2f}°F / {temp_kelvin:.2f}°K")
+
+    # Feels Like
+    feels_like_temp_label.configure(text=f"Despite a temperature of {temp_celsius:.2f}°C, the temperature feels like {feels_like_celsius:.2f}°C / {feels_like_fahrenheit:.2f}°F / {feels_like_kelvin}°K.")
+
+    # Humidity
+    humidity_label.configure(text=f"The humidity is {humidity}%.")
+
+    # Wind Speed
+    wind_speed_label.configure(text=f"The wind speed is {wind_speed:.2f} m/s.")
+
+    # Weather Description
+    description_label.configure(text=f"The general weather has: {description}.")
 
     # print(f"Sunrise is at {sunrise} and sunset is at {sunset}.")
 
@@ -87,24 +103,25 @@ def get_response(api_url):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching weather data: {e}")
         sys.exit(1)
+    except response.status_code == 404:
+        messagebox.showerror("Error", "City not found.")
+        return None
 
 
 # Query the API response
 def query_response(response):
     temp_kelvin = response['main']['temp']
-
     feels_like_kelvin = response['main']['feels_like']
-
     humidity = response['main']['humidity']
-
     wind_speed = response['wind']['speed']
-
     description = response['weather'][0]['description']
+    country = response['sys']['country']
+    icon_id = response['weather'][0]['icon']
 
 #     # sunrise = dt.datetime.utcfromtimestamp(['sys']['sunrise'] + response['timezone'])
 #     # sunset = dt.datetime.utcfromtimestamp(['sys']['sunset'] + response['timezone'])
 
-    return temp_kelvin, feels_like_kelvin, humidity, wind_speed, description # sunrise, sunset)
+    return temp_kelvin, feels_like_kelvin, humidity, wind_speed, description, country, icon_id # sunrise, sunset)
 
 
 # Temperature converter to convert Kelvin to Celsius and Fahrenheit
@@ -113,92 +130,59 @@ def temp_converter(temp_kelvin):
     temp_fahrenheit = temp_celsius * (9/5) + 32
     return temp_celsius, temp_fahrenheit
 
+def get_icon(icon_id):
+    # Icon Url from Openweathermap
+    icon_url = f"http://openweathermap.org/img/wn/{icon_id}@2x.png"
+    # Get the weather icon image from the icon_url
+    image = Image.open(requests.get(icon_url, stream=True).raw)
+    icon = ImageTk.PhotoImage(image)
+    return icon
 
-if __name__ == "__main__":
-    main()
+# -------- Frontend // GUI --------------------------------------------------
 
-
-
-
-
-# --------------------------------------------------------------------------------------- #
-# GUI Draft 
-# ---------------------------------------------------------------------------------------- #
-
-# # Function to get weather info from API
-# def get_weather(city_name):
-#     API_Key = "fjdabfajdbajdbjd"
-#     url = f"hdshdhsvdh{city_name}bdhfbhdbfhd{API_Key}"
-#     response = requests.get(url)
-
-#     if res.status_code == 404:
-#         messagebox.showerror("Error", "City not found.")
-#         return None
-    
-#     # Parse the response JSON
-#     weather = response.json()
-#     icon_id = weather['weather'][0]['icon']
-#     temp_celsius = weather['main']['temp'] - 273.15
-#     description = weather['weather'][0]['description']
-#     city_name = weather['name']
-#     country = weather['sys']['country']
-
-#     # Icon Url and weather info
-#     icon_url = f"http://openweathermap.org/img/wn/{icon_id}@2x.png"
-#     return (icon_url, temp_celsius, description, city_name, country)
-
-#     # If the city is found, unpack the weather information, icon_url, temp, descr...
-#     location_label.configure(text=f"{city_name}, {country}")
-
-#     # Get the weather icon image from the URL and update the icon label
-#     Image = Image.open(requests.get(icon_url, stream=True).raw)
-#     icon = ImageTk.PhotoImage(Image)
-#     icon_label.configure(image=icon)
-#     icon_label.image = icon
-
-#     # Update the temperature and decription labels
-#     temp_celsius_label.configure(text=f"Temperature: {temp_celsius:.2f}oC")
-#     description_label.configure(text=f"Description: {description:.2f}")
-
-# # Function to search weather for a city
-# def search():
-#     city = city_name_entry.get()
-#     result = get_weather(city)
-#     if result in None:
-#         return
-
-# # Frontend
-# # Set window
-# root = ttkbootstrap.Window(themename="morph")
-# # App Title on title bar
-# root.title("Weather App")
-# # Window size
-# root.geometry("400x400")
+# Set window
+root = ttkbootstrap.Window(themename="morph")
+# App Title on title bar
+root.title("Weather App")
+# Window size
+root.geometry("400x400")
 
 
-# # Entry widget to enter the city name
-# city_name_entry = ttkbootstrap.Entry(root, font="Helvetica, 18")
-# city_name_entry.pack(pady=10)
+# Entry widget to enter the city name
+city_name_entry = ttkbootstrap.Entry(root, font="Inter, 18")
+city_name_entry.pack(pady=10)
 
-# # Button widget to search for the weather information
-# search_button = ttkbootstrap.Button(root, text="Search", command=search, bootstyle="warning")
-# search_button.pack(pady=10)
+# Button widget to search for the weather information
+search_button = ttkbootstrap.Button(root, text="Search", command=main, bootstyle="warning")
+search_button.pack(pady=10)
 
-# # Label widget to show the city/country name
-# location_label = tk.Label(root, font="Helvetica, 25")
-# location_label.pack(pady=20)
+# Label widget to show the city/country name
+location_label = tk.Label(root, font="Inter, 25")
+location_label.pack(pady=20)
 
-# # Label widget to show the weather icon
-# icon_label = tk.Label(root)
-# icon_label.pack()
+# Label widget to show the weather icon
+icon_label = tk.Label(root)
+icon_label.pack()
 
-# # Label widget to show the temperature
-# temp_celsius_label = tk.Label(root, font="Helvetica, 20")
-# temp_celsius_label.pack()
+# Label widget to show the temperature
+temp_label = tk.Label(root, font="Inter, 20")
+temp_label.pack()
 
-# # Label widget to show the description
-# description_label = tk.Label(root, font="Helvetica, 20")
-# description_label.pack()
+# Label widget to show what temperature feels like
+feels_like_temp_label = tk.Label(root, font="Inter, 20")
+feels_like_temp_label.pack()
+
+# Label widget to show the humidity
+humidity_label = tk.Label(root, font="Inter, 20")
+humidity_label.pack()
+
+# Label widget to show the wind speed
+wind_speed_label = tk.Label(root, font="Inter, 20")
+wind_speed_label.pack()
+
+# Label widget to show the description
+description_label = tk.Label(root, font="Inter, 20")
+description_label.pack()
 
 
-# root.mainloop()
+root.mainloop()
