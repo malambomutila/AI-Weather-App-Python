@@ -2,6 +2,8 @@
 # -------------------------------------------------------------------------------------------------------------#
 
 # Import libraries
+import speech_recognition as sr
+import pyttsx3
 import sys
 import requests
 import json
@@ -37,11 +39,17 @@ The API should be the only text in the text file.
 '''
 
 # Collect the city name from the user and read API key from text file.
-def main(event=None):
-    try:
-        city_name = city_name_entry.get().strip().title()
-    except (KeyboardInterrupt, EOFError):
-        sys.exit(1)
+def main(event=None, use_voice=False):
+    # Use the voice as input if voice is chosen
+    if use_voice:
+        city_name = listen_for_city()
+        if not city_name:
+            return
+    else:
+        try:
+            city_name = city_name_entry.get().strip().title() # If voice is not given
+        except (KeyboardInterrupt, EOFError):
+            sys.exit(1)
     
     # Read API key from file and strip any extra whitespace/newlines
     with open('api_key.txt', 'r') as f:
@@ -88,6 +96,22 @@ def main(event=None):
     description_label.configure(text=f"The general weather has: {description}.")
 
     # print(f"Sunrise is at {sunrise} and sunset is at {sunset}.")
+
+    # Update GUI
+    root.update()
+
+    # --------------- AI Reads the weather ------------------------------------------
+    # ----- Prepare Weather data for AI Voice -----------------------------------
+
+    weather_info = f"The weather in {city_name}, {country} is as follows. "
+    weather_info += f"The temperature is {temp_celsius:.2f} degrees Celsius which equates to {temp_fahrenheit:.2f} degrees Fahrenheit and {temp_kelvin:.2f} degrees Kelvin. "
+    weather_info += f"Despite that, it actually feels like {feels_like_celsius:.2f} degrees celsius. "
+    weather_info += f"The humidity is {humidity} percent. "
+    weather_info += f"AND the wind speed is {wind_speed:.2f} meters per second. "
+    weather_info += f"In summary, the general weather is {description}."
+
+    if use_voice:
+        speak_weather(weather_info)
 
 
 def get_response(api_url):
@@ -138,6 +162,38 @@ def get_icon(icon_id):
     icon = ImageTk.PhotoImage(image)
     return icon
 
+# -------- AI Voice --------------------------------------------------------
+
+def listen_for_city():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening for city name...")
+        audio = recognizer.listen(source)
+    
+    try:
+        text = recognizer.recognize_google(audio)
+        print(f"You said: {text}")
+        return extract_city_name(text)
+    except sr.UnknownValueError:
+        print("Sorry, I couldn't understand that.")
+        return None
+    except sr.RequestError:
+        print("Sorry, there was an error with the speech recognition service.")
+        return None
+
+def extract_city_name(text):
+    # Simple extraction - assumes the city name is the last word
+    words = text.split()
+    if len(words) > 0 and "weather" in text.lower():
+        return words[-1]
+    return None
+
+def speak_weather(weather_info):
+    engine = pyttsx3.init()
+    engine.say(weather_info)
+    engine.runAndWait()
+
+
 # -------- Frontend // GUI --------------------------------------------------
 
 # Set window
@@ -145,7 +201,7 @@ root = ttkbootstrap.Window(themename="morph")
 # App Title on title bar
 root.title("Weather App - Malambo Mutila 2024")
 # Window size (width (horiz) x height (vert))
-root.geometry("600x550")
+root.geometry("600x600")
 
 
 # Entry widget to enter the city name
@@ -156,6 +212,10 @@ city_name_entry.bind("<Return>", main) # Respond to "enter"/"return"
 # Button widget to search for the weather information
 search_button = ttkbootstrap.Button(root, text="Search", command=main, bootstyle="warning")
 search_button.pack()
+
+# ----- Voice Search Button ----------
+voice_button = ttkbootstrap.Button(root, text="Voice Search", command=lambda: main(use_voice=True), bootstyle="info")
+voice_button.pack(pady=10)
 
 # Label widget to show the city/country name
 location_label = tk.Label(root, font=("Inter Light", 12))
