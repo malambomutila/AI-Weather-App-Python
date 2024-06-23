@@ -1,5 +1,11 @@
 # The depth of the comments serve as helpful notes to those new to Python - to be moved to documentation/readme
 # -------------------------------------------------------------------------------------------------------------#
+# Next:
+# -- Use Elevenlabs module/API to make the voice better. Use "Adam"
+# -- Implement wake word functionality. React to "Adam"
+# -- Improve the GUI for output
+# -- Improve the GUI for wake word --- animation should show waiting and active listening.
+# -- Type out what Adam says and then print print out the summary
 
 # Import libraries
 import speech_recognition as sr
