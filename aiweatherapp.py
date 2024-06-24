@@ -117,7 +117,8 @@ def main(event=None, use_voice=False):
     weather_info += f"In summary, the general weather is {description}."
 
     if use_voice:
-        speak_weather(weather_info)
+        # speak_weather(weather_info) # Python Pyttsx3
+        speak_with_elevenlabs(weather_info) # Adam from ElevenLabs.
 
 
 def get_response(api_url):
@@ -198,6 +199,13 @@ def speak_weather(weather_info):
     engine = pyttsx3.init()
     engine.say(weather_info)
     engine.runAndWait()
+
+def speak_with_elevenlabs(weather_info):
+    audio = elevenlabs.generate(
+        text = weather_info
+        voice = "Adam"
+    )
+    elevenlabs.play(audio)
 
 
 # -------- Frontend // GUI --------------------------------------------------
