@@ -10,6 +10,7 @@
 # Import libraries
 import speech_recognition as sr
 import pyttsx3
+import elevenlabs
 import sys
 import requests
 import json
@@ -18,6 +19,8 @@ import ttkbootstrap
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+from elevenlabs import play
+from elevenlabs.client import ElevenLabs
 
 
 '''
@@ -202,10 +205,23 @@ def speak_weather(weather_info):
 
 def speak_with_elevenlabs(weather_info):
     audio = elevenlabs.generate(
-        text = weather_info
+        text = weather_info,
         voice = "Adam"
     )
     elevenlabs.play(audio)
+
+# --- ElevenLabs USage 2024 ----
+# client = ElevenLabs(
+#   api_key="YOUR_API_KEY", # Defaults to ELEVEN_API_KEY
+# )
+
+# audio = client.generate(
+#   text="Hello! 你好! Hola! नमस्ते! Bonjour! こんにちは! مرحبا! 안녕하세요! Ciao! Cześć! Привіт! வணக்கம்!",
+#   voice="Rachel",
+#   model="eleven_multilingual_v2"
+# )
+# play(audio)
+
 
 
 # -------- Frontend // GUI --------------------------------------------------
